@@ -19,9 +19,28 @@ const PromptCardList = ({ data, handleTagClick }) => {
 const Feed = () => {
   const [searchText, setSearchText] = useState("");
   const [posts, setPosts] = useState([]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
 
   const handleSearchChange = (e) => {
-    setSearchText(e.target.value);
+    const value = e.target.value;
+    setSearchText(value);
+
+    if (value) {
+      const newPost = posts.filter(
+        (post) =>
+          post.tag.includes(value) ||
+          post.prompt.includes(value) ||
+          post.creator.username.includes(value)
+      );
+      setFilteredPosts(newPost);
+    } else {
+      setFilteredPosts([]);
+    }
+  };
+  const handleTagClick = (tag) => {
+    setSearchText(tag);
+    const newPost = posts.filter((post) => post.tag === tag);
+    setFilteredPosts(newPost);
   };
 
   useEffect(() => {
@@ -46,7 +65,11 @@ const Feed = () => {
         />
       </form>
 
-      <PromptCardList data={posts} handleTagClick={() => {}} />
+      {searchText ? (
+        <PromptCardList data={filteredPosts} handleTagClick={handleTagClick} />
+      ) : (
+        <PromptCardList data={posts} handleTagClick={handleTagClick} />
+      )}
     </section>
   );
 };
